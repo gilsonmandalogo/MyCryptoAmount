@@ -6,6 +6,16 @@ export default class HomeScreen extends React.Component {
     title: 'My Crypto Amount',
   };
 
+  constructor(props) {
+    super(props);
+
+    this.cryptocurrencies = [];
+  }
+
+  getCryptocurrencies = () => {
+    return this.cryptocurrencies;
+  };
+
   render() {
     return (
       <FlatList
@@ -16,7 +26,7 @@ export default class HomeScreen extends React.Component {
           {key: 4, currency: 'IOTA', amount: 50, isCryptocurrency: true},
           {key: 5, addButton: true},
         ] }
-        renderItem={item => <CryptoItem data={item} />}
+        renderItem={item => <CryptoItem data={item} navigation={this.props.navigation} getCryptocurrencies={this.getCryptocurrencies} />}
         ListHeaderComponent={<View style={styles.header} />}
         ListFooterComponent={<View style={styles.footer} />}
         ItemSeparatorComponent={() => <View style={styles.separetor} />}
@@ -24,14 +34,30 @@ export default class HomeScreen extends React.Component {
       />
     );
   };
+
+  componentDidMount() {
+    fetch({ url: 'https://min-api.cryptocompare.com/data/all/coinlist' })
+    .then(response => {
+      if (response.status === 200) {
+        response.json()
+        .then(value => {          
+          this.cryptocurrencies = Object.values(value.Data);
+        });
+      };
+    });
+  };
 };
 
 class CryptoItem extends React.PureComponent {
   render() {
-    if (this.props.data.item.addButton === true) {
+    const { navigate } = this.props.navigation;
+    const { item } = this.props.data;
+
+    if (item.addButton === true) {
       return (
         <TouchableNativeFeedback
           background={TouchableNativeFeedback.Ripple('#00D900')}
+          onPress={() => navigate('AddCoinScreen', { getCryptocurrencies: this.props.getCryptocurrencies })}
         >
           <View style={styles.container} >
             <Text style={styles.txtTitle} >Add coin</Text>
@@ -43,22 +69,22 @@ class CryptoItem extends React.PureComponent {
           </View>
         </TouchableNativeFeedback>
       );
-    } if (this.props.data.item.isCryptocurrency === true) {
+    } if (item.isCryptocurrency === true) {
       return (
         <TouchableNativeFeedback
           background={TouchableNativeFeedback.Ripple('#00D900')}
         >
           <View style={styles.container} >
-            <Text style={styles.txtTitle} >{this.props.data.item.currency}</Text>
-            <Text style={styles.txtAmount} >{this.props.data.item.amount}</Text>
+            <Text style={styles.txtTitle} >{item.currency}</Text>
+            <Text style={styles.txtAmount} >{item.amount}</Text>
           </View>
         </TouchableNativeFeedback>
       );
     } else {
       return (
         <View style={styles.container} >
-          <Text style={styles.txtTitle} >Total {this.props.data.item.currency}</Text>
-          <Text style={styles.txtAmount} >{this.props.data.item.amount}</Text>
+          <Text style={styles.txtTitle} >Total {item.currency}</Text>
+          <Text style={styles.txtAmount} >{item.amount}</Text>
         </View>
       );
     };

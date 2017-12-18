@@ -1,8 +1,10 @@
 import { StackNavigator } from "react-navigation";
 import HomeScreen from "./src/screens/HomeScreen";
+import AddCoinScreen from "./src/screens/AddCoinScreen";
 
 export default App = StackNavigator({
   Home: { screen: HomeScreen },
+  AddCoinScreen: { screen: AddCoinScreen },
 }, {
   navigationOptions: {
     headerStyle: {
@@ -11,6 +13,8 @@ export default App = StackNavigator({
     },
     headerTitleStyle: {
       color: 'white',
-    },    
-  },
+    },
+    headerTintColor: 'white',
+    headerPressColorAndroid: '#00D900',
+  },  
 });
