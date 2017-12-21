@@ -1,15 +1,15 @@
 import React from 'react';
-import { StyleSheet, ScrollView, Text, TextInput, TouchableNativeFeedback, View, Picker } from 'react-native';
+import { StyleSheet, ScrollView, Text, TextInput, TouchableNativeFeedback, View } from 'react-native';
 
-export default class AddCoinScreen extends React.Component {
+export default class ChangeAmountScreen extends React.Component {
   static navigationOptions = {
-    title: 'Add coin',
+    title: 'Change amount',
   };
 
   constructor(props) {
     super(props);
 
-    this.state = { cryptocurrency: 'BTC', amount: '' };    
+    this.state = { amount: props.amount };    
   };
 
   add = () => {
@@ -18,39 +18,19 @@ export default class AddCoinScreen extends React.Component {
     goBack();
   };
 
-  renderCryptocurrencies = () => {
-    let cryptocurrencies = this.props.navigation.state.params.getCryptocurrencies();
-    let render = [];
-
-    cryptocurrencies.map((value, index) => {
-      render.push(<Picker.Item key={index} value={value.CoinName} label={value.FullName} />)
-    });
-
-    return render;
-  };
-
   render() {
     return (
       <ScrollView
         contentContainerStyle={styles.container}
         style={styles.scroll}
       >
-        <Text style={styles.text} >Cryptocurrency</Text>
-        <Picker
-          selectedValue={this.state.cryptocurrency}
-          onValueChange={value => this.setState( {cryptocurrency: value} )}
-          mode="dropdown"
-        >
-          {this.renderCryptocurrencies()}
-        </Picker>
-
         <Text style={styles.text} >Amount</Text>
         <TextInput
           placeholder="0"
           onChangeText={amount => this.setState( {amount} )}
           keyboardType="numeric"
           underlineColorAndroid="transparent"
-          onSubmitEditing={() => this.add()}          
+          onSubmitEditing={() => this.add()}
         />
 
         <TouchableNativeFeedback
@@ -58,7 +38,7 @@ export default class AddCoinScreen extends React.Component {
           onPress={() => this.add()}
         >
           <View style={styles.button} >
-            <Text style={styles.txtButton} >Add</Text>
+            <Text style={styles.txtButton} >Change amount</Text>
           </View>
         </TouchableNativeFeedback>
       </ScrollView>

@@ -73,6 +73,7 @@ class CryptoItem extends React.PureComponent {
       return (
         <TouchableNativeFeedback
           background={TouchableNativeFeedback.Ripple('#00D900')}
+          onPress={() => navigate('ChangeAmountScreen', { amount: item.amount })}
         >
           <View style={styles.container} >
             <Text style={styles.txtTitle} >{item.currency}</Text>
