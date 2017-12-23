@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, TouchableNativeFeedback, ScrollView, TextInput, Alert } from 'react-native';
+import { StyleSheet, Text, View, TouchableNativeFeedback, ScrollView, TextInput, Alert, AsyncStorage } from 'react-native';
 import { NavigationActions } from 'react-navigation';
 import firebase from 'firebase';
 import initializeFirebase from '../initializeFirebase';
@@ -12,7 +12,7 @@ export default class LoginScreen extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = { email: '', password: '' };
+    this.state = { email: '', password: '', loading: true };
   };
 
   goHome = () => {
@@ -28,6 +28,7 @@ export default class LoginScreen extends React.Component {
     firebase.auth().signInWithEmailAndPassword(this.state.email, this.state.password)
     .then(() => {
       if (firebase.auth().currentUser.emailVerified) {
+        AsyncStorage.setItem('logged', 'true');
         this.goHome();
       } else {
         Alert.alert('', 'Please verify your email address, check your mailbox');
@@ -61,7 +62,23 @@ export default class LoginScreen extends React.Component {
     });
   };
 
-  render() {
+  verifyUser = async () => {
+    let logged = await AsyncStorage.getItem('logged');
+    
+    if (logged === 'true') {
+      return Promise.resolve(true);
+    } else {
+      return Promise.resolve(false);
+    };
+  };
+
+  render() {    
+    if (this.state.loading === true) {
+      return (
+        <Text style={styles.loadingTxt} >Loading...</Text>
+      );
+    };
+
     return (
       <ScrollView
         contentContainerStyle={styles.container}
@@ -125,8 +142,14 @@ export default class LoginScreen extends React.Component {
   };
 
   componentDidMount() {
-    //This code haven't committed to github to protect the database access, anyway, here comes the default firebase.initializeApp from the firebase docs
-    initializeFirebase();
+    this.verifyUser()
+    .then(userLogged => {
+      if (userLogged === true) {
+        this.goHome();
+      } else {
+        this.setState({ loading: false });
+      };
+    });
   };
 };
 
@@ -155,5 +178,12 @@ const styles = StyleSheet.create({
   },
   space: {
     marginBottom: 8,
+  },
+  loadingTxt: {
+    color: '#003D00',
+    fontSize: 22,
+    textAlign: 'center',
+    textAlignVertical: 'center',
+    flex: 1,
   },
 });
